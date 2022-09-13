@@ -52,6 +52,7 @@
         <module>cassandra</module>
         <module>aerospike</module>
         <module>kafka</module>
+	      <module>webspheremq</module>
         <module>rabbitmq</module>
         <module>kinesis</module>
         <module>hdfs3</module>
@@ -89,6 +90,7 @@
         <module>cassandra</module>
         <module>aerospike</module>
         <module>kafka</module>
+	      <module>webspheremq</module>
         <module>rabbitmq</module>
         <module>kinesis</module>
         <module>hdfs3</module>
