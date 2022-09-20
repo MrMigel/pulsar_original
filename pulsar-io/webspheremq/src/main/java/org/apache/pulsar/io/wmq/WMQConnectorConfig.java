@@ -33,16 +33,13 @@ class WMQConnectorConfig implements Serializable{
   private String port;
 
   private String username;
-
   private String password;
   private String queueName;
-
   private String channelName;
-
   private String qmanName;
   private String topicName;
 
-  private String wmqMessageType = WMQTextMessage.class.getName();
+  private String wmqMessageType = WMQTextMessage.class.getSimpleName();
 
     // Map Objects from class
   public static WMQConnectorConfig load(Map<String, Object> map) throws IOException {
@@ -60,9 +57,9 @@ class WMQConnectorConfig implements Serializable{
         // Check if destination is queue or topic
     String destinationName = null;
     if (StringCheck.isNotEmpty(queueName)) {
-    destinationName = queueName;
+       destinationName = queueName;
     } else if (StringCheck.isNotEmpty(topicName)) {
-    destinationName = topicName;
+       destinationName = topicName;
     }
     Objects.requireNonNull(destinationName, "queueName and topicName all not set.");
     }

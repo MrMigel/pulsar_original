@@ -18,10 +18,6 @@
  */
 package org.apache.pulsar.io.wmq;
 
-//import static com.ibm.mq.constants.CMQC.MQGMO_CONVERT;
-//import static com.ibm.mq.constants.CMQC.MQGMO_FAIL_IF_QUIESCING;
-//import static com.ibm.mq.constants.CMQC.MQGMO_NO_WAIT;
-//import static com.ibm.mq.constants.CMQC.MQGMO_BROWSE_NEXT;
 import static com.ibm.mq.constants.CMQC.MQGMO_CONVERT;
 import static com.ibm.mq.constants.CMQC.MQGMO_FAIL_IF_QUIESCING;
 import static com.ibm.mq.constants.CMQC.MQGMO_WAIT;
@@ -29,13 +25,12 @@ import static com.ibm.mq.constants.CMQC.MQOO_FAIL_IF_QUIESCING;
 import static com.ibm.mq.constants.CMQC.MQOO_INPUT_SHARED;
 import static com.ibm.mq.constants.CMQC.MQOO_INQUIRE;
 import static com.ibm.mq.constants.CMQC.MQWI_UNLIMITED;
+import com.ibm.mq.MQEnvironment;
 import com.ibm.mq.MQGetMessageOptions;
 import com.ibm.mq.MQMessage;
 import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.jmqi.ConnectionName;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +40,9 @@ import org.apache.pulsar.io.core.Source;
 import org.apache.pulsar.io.core.SourceContext;
 import org.apache.pulsar.io.core.annotations.Connector;
 import org.apache.pulsar.io.core.annotations.IOType;
+//import java.io.File;
+//import java.io.FileWriter;
+
 
 @Connector(
         name = "wmq_source",
@@ -59,18 +57,17 @@ public class WMQSource extends PushSource<byte[]> implements Source<byte[]> {
     }
     @Getter
     private WMQConnectorConfig config;
-
     private ConnectionName connection;
-    MQQueue queue1;
-    MQQueueManager qMgr;
-    String messContent;
-    byte[] b;
-    int depth;
-    MQMessage mess = null;
-    MQGetMessageOptions gmo = new MQGetMessageOptions();
-    //SessionConfig session;
-    File file = new File("append.txt");
-    //MQConsumer messageConsumer;
+    private MQQueue queue;
+    private MQQueueManager qMgr;
+    private String messContent;
+    private byte[] b;
+    private int depth;
+    private MQMessage mess = null;
+    private MQGetMessageOptions gmo = new MQGetMessageOptions();
+
+    //File file = new File("_debug.txt");
+
     @Override
     public void open(Map<String, Object> map, SourceContext sourceContext) throws Exception {
 
@@ -81,43 +78,40 @@ public class WMQSource extends PushSource<byte[]> implements Source<byte[]> {
         config = WMQConnectorConfig.load(map);
         config.validate();
 
+        MQEnvironment.hostname = config.getHost();
+        MQEnvironment.channel = config.getChannelName();
+        MQEnvironment.port = Integer.valueOf(config.getPort());
+        MQEnvironment.userID = config.getUsername();
+        MQEnvironment.password = config.getPassword();
+
         qMgr = new MQQueueManager(config.getQmanName());
         int openOptions = MQOO_INQUIRE + MQOO_FAIL_IF_QUIESCING + MQOO_INPUT_SHARED;
-        queue1 = qMgr.accessQueue(config.getQueueName(), openOptions, null, null, null);
+        queue = qMgr.accessQueue(config.getQueueName(), openOptions, null, null, null);
     }
+
 
     public Record<byte[]> read() throws Exception {
 
-        depth = queue1.getCurrentDepth();
+        depth = queue.getCurrentDepth();
 
-            FileWriter fr = new FileWriter(file, true);
-            fr.write("depth= " + depth + "\n");
-            mess = new MQMessage();
-            // Get message contentss
-            gmo.options = MQGMO_WAIT + MQGMO_FAIL_IF_QUIESCING + MQGMO_CONVERT;
-            gmo.waitInterval = MQWI_UNLIMITED;
+        mess = new MQMessage();
+        // Get message contentss
+        gmo.options = MQGMO_WAIT + MQGMO_FAIL_IF_QUIESCING + MQGMO_CONVERT;
+        gmo.waitInterval = MQWI_UNLIMITED;
 
-            queue1.get(mess, gmo);
-            b = new byte[mess.getMessageLength()]; //tworzy byte b o wielkosci mess
-            mess.readFully(b); //wypelnia b trescia z mess
-            messContent = new String(b); //messContent
+        queue.get(mess, gmo);
+        b = new byte[mess.getMessageLength()]; // create byte b mess lenght size
+        mess.readFully(b); // fill b by content of mess
+        messContent = new String(b); // messContent
 
-            fr.write("b= " + b + "\nmessContent= " + messContent + "\nmess= " + mess + "\n");
-            fr.close();
+        // ### Save variables to file - for debugging ###
+        //FileWriter fr = new FileWriter(file, true);
+        //fr.write("depth= " + depth + "\n");
+        //fr.write("b= " + b + "\nmessContent= " + messContent + "\nmess= " + mess + "\n");
+        //fr.write("queue name= " + config.getQueueName() + "\nQmanagerName= " + config.getQmanName());
+        //fr.close();
 
-            Thread.sleep(100);
-
-            //tekst = scan.nextLine();
-
-
-            //} catch (com.ibm.mq.MQException mqex) {
-            //    System.out.println("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
-            //} catch (IOException e) {
-            // TODO Auto-generated catch block
-            //    e.printStackTrace();
-            //}
-            //log.warn("No messages found");
-            //throw new Exception("No messages found");
+        Thread.sleep(100);
 
             return new Record<byte[]>() {
                 @Override
@@ -126,13 +120,11 @@ public class WMQSource extends PushSource<byte[]> implements Source<byte[]> {
 
                 }
             };
-
         }
 
         @Override
         public void close () throws Exception {
-            queue1.close();
+            queue.close();
             qMgr.disconnect();
     }
-
 }

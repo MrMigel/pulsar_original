@@ -18,12 +18,9 @@
  */
 package org.apache.pulsar.io.wmq;
 
-//import static com.ibm.mq.constants.CMQC.MQGMO_CONVERT;
-//import static com.ibm.mq.constants.CMQC.MQGMO_FAIL_IF_QUIESCING;
-//import static com.ibm.mq.constants.CMQC.MQGMO_NO_WAIT;
-//import static com.ibm.mq.constants.CMQC.MQGMO_BROWSE_NEXT;
 import static com.ibm.mq.constants.CMQC.MQOO_INPUT_AS_Q_DEF;
 import static com.ibm.mq.constants.CMQC.MQOO_OUTPUT;
+import com.ibm.mq.MQEnvironment;
 import com.ibm.mq.MQGetMessageOptions;
 import com.ibm.mq.MQMessage;
 import com.ibm.mq.MQPutMessageOptions;
@@ -31,7 +28,6 @@ import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.jmqi.ConnectionName;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import lombok.Getter;
@@ -41,6 +37,7 @@ import org.apache.pulsar.io.core.Sink;
 import org.apache.pulsar.io.core.SinkContext;
 import org.apache.pulsar.io.core.annotations.Connector;
 import org.apache.pulsar.io.core.annotations.IOType;
+//import java.io.File;
 
 @Connector(
         name = "wmq_sink",
@@ -55,17 +52,16 @@ public class WMQSink implements Sink<byte[]> {
     }
     @Getter
     private WMQConnectorConfig config;
-
     private ConnectionName connection;
-    MQQueue queue1;
-    MQQueueManager qMgr;
-    String messContent;
-    byte[] b;
-    MQMessage mess = null;
-    MQGetMessageOptions gmo = new MQGetMessageOptions();
-    //SessionConfig session;
-    File file = new File("append.txt");
-    //MQConsumer messageConsumer;
+    private MQQueue queue;
+    private MQQueueManager qMgr;
+    private String messContent;
+    private byte[] b;
+    private MQMessage mess = null;
+    private MQGetMessageOptions gmo = new MQGetMessageOptions();
+
+    //private File file = new File("_debug.txt");
+
     @Override
     public void open(Map<String, Object> map, SinkContext sinkContext) throws Exception {
 
@@ -76,9 +72,15 @@ public class WMQSink implements Sink<byte[]> {
         config = WMQConnectorConfig.load(map);
         config.validate();
 
+        MQEnvironment.hostname = config.getHost();
+        MQEnvironment.channel = config.getChannelName();
+        MQEnvironment.port = Integer.valueOf(config.getPort());
+        MQEnvironment.userID = config.getUsername();
+        MQEnvironment.password = config.getPassword();
+
         qMgr = new MQQueueManager(config.getQmanName());
         int openOptions = MQOO_OUTPUT | MQOO_INPUT_AS_Q_DEF;
-        queue1 = qMgr.accessQueue(config.getQueueName(), openOptions, null, null, null);
+        queue = qMgr.accessQueue(config.getQueueName(), openOptions, null, null, null);
         log.info("### A new connection to {}:{} has been opened successfully. ###",
                 config.getQmanName(),
                 config.getPort());
@@ -95,11 +97,10 @@ public class WMQSink implements Sink<byte[]> {
 
                 mess.format = MQConstants.MQFMT_STRING;
                 mess.write(record.getValue());
-                queue1.put(mess, pmo);
+                queue.put(mess, pmo);
                 record.ack();
-                //queue1.close();
+                //queue.close();
 
-                //tekst = scan.nextLine();
             } catch (com.ibm.mq.MQException mqex) {
                 //System.out.println("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
                 log.error("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
@@ -114,7 +115,7 @@ public class WMQSink implements Sink<byte[]> {
 
     @Override
     public void close() throws Exception {
-        queue1.close();
+        queue.close();
         qMgr.disconnect();
 
     }
