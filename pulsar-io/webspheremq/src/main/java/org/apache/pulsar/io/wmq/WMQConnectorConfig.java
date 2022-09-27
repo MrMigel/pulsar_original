@@ -33,13 +33,18 @@ class WMQConnectorConfig implements Serializable{
   private String port;
 
   private String username;
-  private String password;
+  private String;
   private String queueName;
   private String channelName;
   private String qmanName;
   private String topicName;
 
   private String wmqMessageType = WMQTextMessage.class.getSimpleName();
+
+  // Connection and open parameters
+  private int mqoo;
+  private int mqgmo;
+  private int mqpmo;
 
     // Map Objects from class
   public static WMQConnectorConfig load(Map<String, Object> map) throws IOException {

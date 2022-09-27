@@ -18,8 +18,6 @@
  */
 package org.apache.pulsar.io.wmq;
 
-import static com.ibm.mq.constants.CMQC.MQOO_INPUT_AS_Q_DEF;
-import static com.ibm.mq.constants.CMQC.MQOO_OUTPUT;
 import com.ibm.mq.MQEnvironment;
 import com.ibm.mq.MQGetMessageOptions;
 import com.ibm.mq.MQMessage;
@@ -37,7 +35,6 @@ import org.apache.pulsar.io.core.Sink;
 import org.apache.pulsar.io.core.SinkContext;
 import org.apache.pulsar.io.core.annotations.Connector;
 import org.apache.pulsar.io.core.annotations.IOType;
-//import java.io.File;
 
 @Connector(
         name = "wmq_sink",
@@ -52,15 +49,16 @@ public class WMQSink implements Sink<byte[]> {
     }
     @Getter
     private WMQConnectorConfig config;
+
     private ConnectionName connection;
-    private MQQueue queue;
+    private MQQueue queue1;
     private MQQueueManager qMgr;
     private String messContent;
     private byte[] b;
     private MQMessage mess = null;
     private MQGetMessageOptions gmo = new MQGetMessageOptions();
-
-    //private File file = new File("_debug.txt");
+    private int mqoo;
+    private int mqpmo;
 
     @Override
     public void open(Map<String, Object> map, SinkContext sinkContext) throws Exception {
@@ -77,45 +75,46 @@ public class WMQSink implements Sink<byte[]> {
         MQEnvironment.port = Integer.valueOf(config.getPort());
         MQEnvironment.userID = config.getUsername();
         MQEnvironment.password = config.getPassword();
+        mqoo = Integer.valueOf(config.getMqoo());
+        mqpmo = Integer.valueOf(config.getMqpmo());
 
         qMgr = new MQQueueManager(config.getQmanName());
-        int openOptions = MQOO_OUTPUT | MQOO_INPUT_AS_Q_DEF;
-        queue = qMgr.accessQueue(config.getQueueName(), openOptions, null, null, null);
+        queue1 = qMgr.accessQueue(config.getQueueName(), mqoo, null, null, null);
         log.info("### A new connection to {}:{} has been opened successfully. ###",
                 config.getQmanName(),
                 config.getPort());
-
     }
 
     public void write(Record<byte[]> record) throws Exception {
 
-            try {
+        try {
 
-                MQPutMessageOptions pmo = new MQPutMessageOptions();
-                pmo.options = MQConstants.MQPMO_ASYNC_RESPONSE;
-                mess = new MQMessage();
+            MQPutMessageOptions pmo = new MQPutMessageOptions();
+            pmo.options = mqpmo;
+            mess = new MQMessage();
 
-                mess.format = MQConstants.MQFMT_STRING;
-                mess.write(record.getValue());
-                queue.put(mess, pmo);
-                record.ack();
-                //queue.close();
+            mess.format = MQConstants.MQFMT_STRING;
+            mess.write(record.getValue());
+            queue1.put(mess, pmo);
+            record.ack();
+            //queue1.close();
 
-            } catch (com.ibm.mq.MQException mqex) {
-                //System.out.println("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
-                log.error("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (Exception e){
-                record.fail();
-                log.warn("### Failed to publish the message to WebsphereMQ ###", e);
-            }
+            //tekst = scan.nextLine();
+        } catch (com.ibm.mq.MQException mqex) {
+            //System.out.println("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
+            log.error("MQException cc=" + mqex.completionCode + " : rc=" + mqex.reasonCode);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e){
+            record.fail();
+            log.warn("### Failed to publish the message to WebsphereMQ ###", e);
+        }
     }
 
     @Override
     public void close() throws Exception {
-        queue.close();
+        queue1.close();
         qMgr.disconnect();
 
     }
