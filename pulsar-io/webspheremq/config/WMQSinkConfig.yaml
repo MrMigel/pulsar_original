@@ -1,0 +1,90 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+tenant: "public"
+namespace: "default"
+# Connector instance name
+name: "wmq_sink"
+inputs:
+  - "wmq_data_to_mq"
+archive: "connectors/pulsar-io-wmq-2.11.0-SNAPSHOT.nar"
+parallelism: 1
+
+configs:
+  protocol: "tcp"
+  host: "127.0.0.1"
+  channelName: "DEV.MQM.SVRCONN"
+  port: "1414"
+  username: "mqm"
+  password: "lenovos10"
+  qmanName: "QM1"
+  queueName: "DEV.QUEUE.2"
+  mqoo: "17"
+  mqpmo: "65536"
+
+### mqoo values ###
+#  MQOO_BIND_AS_Q_DEF	0
+#  MQOO_READ_AHEAD_AS_Q_DEF	0
+#  MQOO_INPUT_AS_Q_DEF	1
+#  MQOO_INPUT_SHARED	2
+#  MQOO_INPUT_EXCLUSIVE	4
+#  MQOO_BROWSE	8
+#  MQOO_OUTPUT	16
+#  MQOO_INQUIRE	32
+#  MQOO_SET	64
+#  MQOO_SAVE_ALL_CONTEXT	128
+#  MQOO_PASS_IDENTITY_CONTEXT	256
+#  MQOO_PASS_ALL_CONTEXT	512
+#  MQOO_SET_IDENTITY_CONTEXT	1024
+#  MQOO_SET_ALL_CONTEXT	2048
+#  MQOO_ALTERNATE_USER_AUTHORITY	4096
+#  MQOO_FAIL_IF_QUIESCING	8192
+#  MQOO_BIND_ON_OPEN	16384
+#  MQOO_BIND_NOT_FIXED	32768
+#  MQOO_CO_OP	131072
+#  MQOO_RESOLVE_LOCAL_TOPIC	262144
+#  MQOO_NO_READ_AHEAD	524288
+#  MQOO_READ_AHEAD	1048576
+#  MQOO_BIND_ON_GROUP	4194304
+
+### mqpmo values ###
+#MQPMO_ALTERNATE_USER_AUTHORITY 4096
+#MQPMO_ASYNC_RESPONSE   65536
+#MQPMO_DEFAULT_CONTEXT  32
+#MQPMO_FAIL_IF_QUIESCING        8192
+#MQPMO_LOGICAL_ORDER    32768
+#MQPMO_NEW_CORREL_ID    128
+#MQPMO_NEW_MSG_ID       64
+#MQPMO_NO_CONTEXT       16384
+#MQPMO_NO_SYNCPOINT     4
+#MQPMO_NONE     0
+#MQPMO_PASS_ALL_CONTEXT 512
+#MQPMO_PASS_IDENTITY_CONTEXT    256
+#MQPMO_RESOLVE_LOCAL_Q  262144
+#MQPMO_RESPONSE_AS_Q_DEF        0
+#MQPMO_RESPONSE_AS_TOPIC_DEF    0
+#MQPMO_SET_ALL_CONTEXT  2048
+#MQPMO_SET_IDENTITY_CONTEXT     1024
+#MQPMO_SYNC_RESPONSE    131072
+#MQPMO_SYNCPOINT        2
+#MQPMO_VERSION_1        1
+#MQPMO_VERSION_2        2
+
+#Full description
+#https://www.ibm.com/docs/en/ibm-mq/7.5?topic=SSFKSJ_7.5.0/com.ibm.mq.javadoc.doc/WMQJavaClasses/constant-values.html

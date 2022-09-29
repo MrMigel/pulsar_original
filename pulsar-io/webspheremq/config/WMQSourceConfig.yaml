@@ -1,0 +1,97 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+tenant: "public"
+namespace: "default"
+name: "wmq_source"
+topicName: "wmq_data_from_mq"
+archive: "connectors/pulsar-io-wmq.nar"
+parallelism: 1
+
+configs:
+  protocol: "tcp"
+  host: "10.0.0.4"
+  channelName: "DEV.PULSAR.SVRCONN"
+  port: "1414"
+  username: "mqm"
+  password: "lenovos10"
+  qmanName: "QM1"
+  queueName: "DEV.QUEUE.1"
+  mqoo: "8226"
+  mqgmo: "24577"
+
+### mqoo values ###
+#  MQOO_BIND_AS_Q_DEF	0
+#  MQOO_READ_AHEAD_AS_Q_DEF	0
+#  MQOO_INPUT_AS_Q_DEF	1
+#  MQOO_INPUT_SHARED	2
+#  MQOO_INPUT_EXCLUSIVE	4
+#  MQOO_BROWSE	8
+#  MQOO_OUTPUT	16
+#  MQOO_INQUIRE	32
+#  MQOO_SET	64
+#  MQOO_SAVE_ALL_CONTEXT	128
+#  MQOO_PASS_IDENTITY_CONTEXT	256
+#  MQOO_PASS_ALL_CONTEXT	512
+#  MQOO_SET_IDENTITY_CONTEXT	1024
+#  MQOO_SET_ALL_CONTEXT	2048
+#  MQOO_ALTERNATE_USER_AUTHORITY	4096
+#  MQOO_FAIL_IF_QUIESCING	8192
+#  MQOO_BIND_ON_OPEN	16384
+#  MQOO_BIND_NOT_FIXED	32768
+#  MQOO_CO_OP	131072
+#  MQOO_RESOLVE_LOCAL_TOPIC	262144
+#  MQOO_NO_READ_AHEAD	524288
+#  MQOO_READ_AHEAD	1048576
+#  MQOO_BIND_ON_GROUP	4194304
+
+### mqgmo values ###
+#  MQGMO_WAIT	1
+#  MQGMO_NO_WAIT	0
+#  MQGMO_SET_SIGNAL	8
+#  MQGMO_FAIL_IF_QUIESCING	8192
+#  MQGMO_SYNCPOINT	2
+#  MQGMO_SYNCPOINT_IF_PERSISTENT	4096
+#  MQGMO_NO_SYNCPOINT	4
+#  MQGMO_MARK_SKIP_BACKOUT	128
+#  MQGMO_BROWSE_FIRST	16
+#  MQGMO_BROWSE_NEXT	32
+#  MQGMO_BROWSE_MSG_UNDER_CURSOR	2048
+#  MQGMO_BROWSE_HANDLE	17825808
+#  MQGMO_BROWSE_CO_OP	18874384
+#  MQGMO_MSG_UNDER_CURSOR	256
+#  MQGMO_LOCK	512
+#  MQGMO_UNLOCK	1024
+#  MQGMO_ACCEPT_TRUNCATED_MSG
+#  MQGMO_CONVERT	16384
+#  MQGMO_LOGICAL_ORDER	32768
+#  MQGMO_COMPLETE_MSG	65536
+#  MQGMO_ALL_MSGS_AVAILABLE	131072
+#  MQGMO_ALL_SEGMENTS_AVAILABLE	262144
+#  MQGMO_MARK_BROWSE_HANDLE	1048576
+#  MQGMO_MARK_BROWSE_CO_OP	2097152
+#  MQGMO_UNMARK_BROWSE_CO_OP	4194304
+#  MQGMO_UNMARK_BROWSE_HANDLE	8388608
+#  MQGMO_UNMARKED_BROWSE_MSG	16777216
+#  MQGMO_PROPERTIES_FORCE_MQRFH2	33554432
+#  MQGMO_NO_PROPERTIES	67108864
+#  MQGMO_PROPERTIES_IN_HANDLE	134217728
+#  MQGMO_PROPERTIES_COMPATIBILITY	268435456
+#  MQGMO_PROPERTIES_AS_Q_DEF	0
+#  MQGMO_NONE	0
