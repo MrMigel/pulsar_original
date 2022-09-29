@@ -23,7 +23,7 @@ namespace: "default"
 name: "wmq_sink"
 inputs:
   - "wmq_data_to_mq"
-archive: "connectors/pulsar-io-wmq-2.11.0-SNAPSHOT.nar"
+archive: "pulsar-io/webspheremq/target/pulsar-io-wmq-2.10.1-SNAPSHOT.nar"
 parallelism: 1
 
 configs:
