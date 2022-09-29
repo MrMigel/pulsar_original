@@ -33,7 +33,7 @@ class WMQConnectorConfig implements Serializable{
   private String port;
 
   private String username;
-  private String;
+  private String password;
   private String queueName;
   private String channelName;
   private String qmanName;
