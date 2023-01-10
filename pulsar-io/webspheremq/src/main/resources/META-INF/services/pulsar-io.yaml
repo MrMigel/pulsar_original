@@ -22,4 +22,4 @@ description: WebsphereMQ source and sink connector
 sourceClass: org.apache.pulsar.io.wmq.WMQSource
 sinkClass: org.apache.pulsar.io.wmq.WMQSink
 sourceConfigClass: org.apache.pulsar.io.wmq.WMQConnectorConfig
-#sinkConfigClass: org.apache.pulsar.io.wmq.WMQSinkConfig
+sinkConfigClass: org.apache.pulsar.io.wmq.WMQConnectorConfig
