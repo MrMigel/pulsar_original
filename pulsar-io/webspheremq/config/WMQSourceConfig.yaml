@@ -21,7 +21,7 @@ tenant: "public"
 namespace: "default"
 name: "wmq_source"
 topicName: "wmq_data_from_mq"
-archive: "connectors/pulsar-io-wmq.nar"
+archive: "pulsar-io/webspheremq/target/pulsar-io-wmq-2.10.1-SNAPSHOT.nar"
 parallelism: 1
 
 configs:
